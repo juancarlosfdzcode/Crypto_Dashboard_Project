@@ -1,5 +1,5 @@
-## Importación de librerías ##
 
+## Importación de librerías ##
 import requests
 import pandas as pd
 import os
@@ -11,17 +11,13 @@ from datetime import datetime
 import time
 
 ## Configuración del Logging ##
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 ## Definición de clases ##
-
 @dataclass
 class Token:
-
     """Clase para representar un cryptoactivo."""
-
     coin: str
     id: str
 
@@ -31,27 +27,24 @@ class Token:
 
 @dataclass
 class APIConfig:
-
     """Configuración para la API de CoinGecko."""
-
     fromDate: str
     toDate: str
     base_url: str = 'https://api.coingecko.com/api/v3'
     vs_currency: str = 'usd'
     timeout: int = 30
-
+    rate_limit_delay: float = 2.0  # Segundos entre requests
+    max_retries: int = 3  # Número máximo de reintentos
+    retry_backoff_factor: float = 1.5  # Factor para backoff exponencial
 
 class CoinGeckoAPIError(Exception):
     """Error personalizado para los errores de la API."""
-
     pass
 
 class CoinGeckoClient:
-
     """Cliente para interactuar con la API de CoinGecko"""
 
     def __init__(self, config: APIConfig, api_token: Optional[str] = None):
-
         load_dotenv()
         self.api_token = os.getenv('coinGeckoToken')
         self.config = config
@@ -59,7 +52,9 @@ class CoinGeckoClient:
         if not self.api_token:
             raise ValueError('Es necesario una API Token.')
         
+        # Validar configuración de fechas
         self._validate_date_config()
+        
         self.headers = {
             'accept': 'application/json',
             'x-cg-api-key': self.api_token
@@ -68,6 +63,9 @@ class CoinGeckoClient:
         self.session = requests.Session()
         self.session.headers.update(self.headers)
 
+        # Rate limiting - CORREGIDO: Añadir atributo faltante
+        self.last_request_time = 0.0
+
         self.default_tokens = [
             Token(coin='aave', id='aave'),
             Token(coin='cronos', id='crypto-com-chain'),
@@ -75,18 +73,15 @@ class CoinGeckoClient:
         ]
 
     def ping(self) -> bool:
-
         """Verificar la conectividad con la API"""
-
         try:
             url = f'{self.config.base_url}/ping'
-            response = self.session.get(url, timeout=self.config.timeout)
-            response.raise_for_status()
+            # CORREGIDO: Usar método con retry
+            self._make_request_with_retry(url)
             logger.info('Conexión establecida con la API de CoinGecko')
-
             return True
         
-        except requests.RequestException as e:
+        except CoinGeckoAPIError as e:
             logger.error(f'Error conectando con la API: {e}')
             raise CoinGeckoAPIError(f'No se puede establecer conexión con el servidor: {e}')
 
@@ -253,25 +248,29 @@ class CoinGeckoClient:
     def _convert_to_unix_timestamp(self, date_str: str) -> int:
         """Convertir fecha ISO o timestamp Unix a timestamp Unix"""
         try:
+            # Si ya es un timestamp Unix (string de números)
             if date_str.isdigit():
-
                 return int(date_str)
             
+            # CORREGIDO: Usar datetime.fromisoformat() en lugar de pd.to_datetime()
             if 'T' in date_str:
-                dt = pd.to_datetime(date_str)
+                # Formato: YYYY-MM-DDTHH:MM o YYYY-MM-DDTHH:MM:SS
+                dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
             else:
-                dt = pd.to_datetime(date_str + ' 00:00:00')
+                # Formato: YYYY-MM-DD (añadir 00:00:00)
+                dt = datetime.fromisoformat(date_str + 'T00:00:00')
             
-            return int(dt.timestamp())
+            timestamp = int(dt.timestamp())
+            logger.debug(f'Fecha {date_str} convertida a timestamp: {timestamp}')
+            return timestamp
             
         except Exception as e:
-            raise CoinGeckoAPIError(f'Error convirtiendo fecha {date_str}: {e}')
+            raise CoinGeckoAPIError(f'Error convirtiendo fecha {date_str} a timestamp Unix: {e}')
 
     def get_token_market_data(self, token: Token) -> Dict:
-
         """Obtener datos de mercado para un token específico."""
-
         try:
+            # Convertir fechas a timestamps Unix
             from_timestamp = self._convert_to_unix_timestamp(self.config.fromDate)
             to_timestamp = self._convert_to_unix_timestamp(self.config.toDate)
 
@@ -283,23 +282,23 @@ class CoinGeckoClient:
             }
 
             logger.info(f'Obteniendo información de: {token.coin} desde {self.config.fromDate} hasta {self.config.toDate}')
-            response = self.session.get(url, params=params, timeout=self.config.timeout)
-            response.raise_for_status()
+            logger.debug(f'Parámetros: from={from_timestamp}, to={to_timestamp}')
+            
+            # CORREGIDO: Usar método con retry en lugar de session.get() directo
+            data = self._make_request_with_retry(url, params)
             logger.info(f'Información obtenida correctamente para {token.coin}')
 
-            return response.json()
+            return data
 
-        except requests.RequestException as e:
-            logger.error(f'Error fetching token data for {token.coin}. Status code: {response.status_code if "response" in locals() else "N/A"}')            
-            if 'response' in locals():
-                logger.error(f'Respuesta: {response.text}')
-
-            raise CoinGeckoAPIError(f'Error obteniendo datos para {token.coin}: {e}')
+        except CoinGeckoAPIError:
+            # Re-lanzar errores de CoinGecko (ya contienen el contexto)
+            raise
+        except Exception as e:
+            # Capturar otros errores inesperados
+            raise CoinGeckoAPIError(f'Error inesperado obteniendo datos para {token.coin}: {e}')
         
     def process_token_data(self, token_data: Dict, coin: str) -> pd.DataFrame:
-        
         """Procesar los datos del token y convertirlos a DataFrame"""
-
         try:
             prices = token_data.get('prices', [])
             market_caps = token_data.get('market_caps', [])
@@ -329,7 +328,6 @@ class CoinGeckoClient:
 
         except Exception as e:
             logger.error(f'Error procesando datos para {coin}: {e}')
-
             raise CoinGeckoAPIError(f'Error procesando datos para {coin}: {e}')
 
     def data_extraction(self, tokens: Optional[List[Token]] = None) -> pd.DataFrame:
@@ -342,7 +340,6 @@ class CoinGeckoClient:
         Returns:
             DataFrame combinado con datos de todos los tokens.
         """
-
         if tokens is None:
             tokens = self.default_tokens
         
@@ -350,7 +347,6 @@ class CoinGeckoClient:
         all_dataframes = []
 
         try:
-
             self.ping()
 
             for token in tokens:
@@ -363,50 +359,39 @@ class CoinGeckoClient:
 
                 except CoinGeckoAPIError as e:
                     logger.warning(f'Saltando token {token.coin} debido a error: {e}')
-
                     continue
 
             if all_dataframes:
                 final_df = pd.concat(all_dataframes, ignore_index=True)
                 logger.info(f'DataFrame final creado con {len(final_df)} registros totales')
-
                 return final_df
             
             else:
                 logger.warning('No se obtuvieron datos de ningún token')                
-                
                 return pd.DataFrame()
     
         except Exception as e:
             logger.error(f'Error en data_extraction: {e}')
-
             raise CoinGeckoAPIError(f'No se ha podido ejecutar workflow: {e}')
         
     def get_available_tokens(self) -> List[Token]:
-
         """Retorna la lista de tokens disponibles"""
-
         return self.default_tokens
     
     def add_token(self, coin: str, token_id: str) -> None:
-
         """Agregar un nuevo token a la lista"""
-
         new_token = Token(coin=coin, id=token_id)
         self.default_tokens.append(new_token)
         logger.info(f'Token {coin} agregado a la lista')
     
     def remove_token(self, coin: str) -> bool:
-
         """Remover un token de la lista por nombre de coin"""
-
         for i, token in enumerate(self.default_tokens):
             if token.coin == coin:
                 removed_token = self.default_tokens.pop(i)
                 logger.info(f'Token {removed_token.coin} removido de la lista')
                 return True
         logger.warning(f'Token {coin} no encontrado en la lista')
-
         return False
 
 if __name__ == "__main__":
