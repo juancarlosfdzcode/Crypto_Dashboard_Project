@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 import logging
+from datetime import datetime
 
 ## Configuración del Logging ##
 
@@ -36,7 +37,6 @@ class APIConfig:
     toDate: str
     base_url: str = 'https://api.coingecko.com/api/v3'
     vs_currency: str = 'usd'
-    interval: str = ''
     timeout: int = 30
 
 
@@ -58,6 +58,7 @@ class CoinGeckoClient:
         if not self.api_token:
             raise ValueError('Es necesario una API Token.')
         
+        self._validate_date_config()
         self.headers = {
             'accept': 'application/json',
             'x-cg-api-key': self.api_token
@@ -88,17 +89,83 @@ class CoinGeckoClient:
             logger.error(f'Error conectando con la API: {e}')
             raise CoinGeckoAPIError(f'No se puede establecer conexión con el servidor: {e}')
 
+    def _validate_date_config(self) -> None:
+        """
+        Validar la configuración de fechas.
+        
+        Raises:
+            CoinGeckoAPIError: Si las fechas no son válidas
+        """
+        try:
+            # Validar que las fechas no estén vacías
+            if not self.config.fromDate or not self.config.toDate:
+                raise CoinGeckoAPIError('fromDate y toDate son obligatorios')
+            
+            # Convertir fechas para validación
+            from_timestamp = self._convert_to_unix_timestamp(self.config.fromDate)
+            to_timestamp = self._convert_to_unix_timestamp(self.config.toDate)
+            
+            # Validar que fromDate < toDate
+            if from_timestamp >= to_timestamp:
+                raise CoinGeckoAPIError(f'fromDate ({self.config.fromDate}) debe ser anterior a toDate ({self.config.toDate})')
+            
+            # Validar que no sean fechas muy futuras (permitir algunos días de margen)
+            now_timestamp = int(datetime.now().timestamp())
+            max_future_days = 2  # Margen de 2 días para diferencias de zona horaria
+            max_timestamp = now_timestamp + (max_future_days * 24 * 60 * 60)
+            
+            if to_timestamp > max_timestamp:
+                raise CoinGeckoAPIError(f'toDate ({self.config.toDate}) no puede ser muy futuro. CoinGecko solo tiene datos históricos.')
+            
+            # Validar que el rango no sea demasiado grande (máximo 365 días)
+            max_days = 365
+            max_range_seconds = max_days * 24 * 60 * 60
+            if (to_timestamp - from_timestamp) > max_range_seconds:
+                raise CoinGeckoAPIError(f'El rango de fechas no puede ser mayor a {max_days} días')
+            
+            # Validar que no sea muy antiguo (CoinGecko tiene datos desde ~2009)
+            min_timestamp = int(datetime(2009, 1, 1).timestamp())
+            if from_timestamp < min_timestamp:
+                raise CoinGeckoAPIError(f'fromDate ({self.config.fromDate}) es demasiado antigua. CoinGecko tiene datos desde 2009.')
+                
+            logger.info(f'Validación de fechas exitosa: {self.config.fromDate} a {self.config.toDate}')
+            
+        except CoinGeckoAPIError:
+            # Re-lanzar errores de validación
+            raise
+        except Exception as e:
+            raise CoinGeckoAPIError(f'Error validando configuración de fechas: {e}')
+
+    def _convert_to_unix_timestamp(self, date_str: str) -> int:
+        """Convertir fecha ISO o timestamp Unix a timestamp Unix"""
+        try:
+            if date_str.isdigit():
+
+                return int(date_str)
+            
+            if 'T' in date_str:
+                dt = pd.to_datetime(date_str)
+            else:
+                dt = pd.to_datetime(date_str + ' 00:00:00')
+            
+            return int(dt.timestamp())
+            
+        except Exception as e:
+            raise CoinGeckoAPIError(f'Error convirtiendo fecha {date_str}: {e}')
+
     def get_token_market_data(self, token: Token) -> Dict:
 
         """Obtener datos de mercado para un token específico."""
 
         try:
+            from_timestamp = self._convert_to_unix_timestamp(self.config.fromDate)
+            to_timestamp = self._convert_to_unix_timestamp(self.config.toDate)
+
             url = f'{self.config.base_url}/coins/{token.id}/market_chart/range'
             params = {
                 'vs_currency': self.config.vs_currency,
-                'interval': self.config.interval,
-                'from': self.config.fromDate,
-                'to': self.config.toDate
+                'from': from_timestamp,
+                'to': to_timestamp
             }
 
             logger.info(f'Obteniendo información de: {token.coin} desde {self.config.fromDate} hasta {self.config.toDate}')
@@ -192,7 +259,7 @@ class CoinGeckoClient:
                 return final_df
             
             else:
-                logger.warning(f'Error en data_extraction: {e}')
+                logger.warning('No se obtuvieron datos de ningún token')                
                 
                 return pd.DataFrame()
     
