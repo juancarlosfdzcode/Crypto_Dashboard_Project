@@ -1,5 +1,5 @@
 # test.py
-from data_extraction.fetchData import CoinGeckoClient, APIConfig
+from src.extractors.fetchData import CoinGeckoClient, APIConfig
 
 # Crear configuración
 config = APIConfig(
