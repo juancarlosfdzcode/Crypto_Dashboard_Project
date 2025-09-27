@@ -8,6 +8,7 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 import logging
 from datetime import datetime
+import time
 
 ## Configuración del Logging ##
 
@@ -88,6 +89,119 @@ class CoinGeckoClient:
         except requests.RequestException as e:
             logger.error(f'Error conectando con la API: {e}')
             raise CoinGeckoAPIError(f'No se puede establecer conexión con el servidor: {e}')
+
+    def _make_request_with_retry(self, url: str, params: Optional[Dict] = None) -> Dict:
+        """
+        Realizar request con retry automático y backoff exponencial.
+        
+        Args:
+            url: URL completa del endpoint
+            params: Parámetros del request
+            
+        Returns:
+            Dict: Respuesta JSON de la API
+            
+        Raises:
+            CoinGeckoAPIError: Si falla después de todos los reintentos
+        """
+        last_exception = None
+        
+        for attempt in range(self.config.max_retries + 1):  # +1 para incluir el intento inicial
+            try:
+                # Aplicar rate limiting antes de cada intento
+                self._apply_rate_limit()
+                
+                # Hacer el request
+                response = self.session.get(url, params=params, timeout=self.config.timeout)
+                response.raise_for_status()
+                
+                # Si llegamos aquí, fue exitoso
+                if attempt > 0:
+                    logger.info(f'Request exitoso en intento {attempt + 1}')
+                
+                return response.json()
+                
+            except requests.exceptions.RequestException as e:
+                last_exception = e
+                
+                # Determinar si debemos reintentar
+                should_retry = self._should_retry(e, response if 'response' in locals() else None)
+                
+                if attempt < self.config.max_retries and should_retry:
+                    # Calcular delay con backoff exponencial
+                    delay = self.config.retry_backoff_factor ** attempt
+                    
+                    logger.warning(f'Request falló (intento {attempt + 1}/{self.config.max_retries + 1}): {e}')
+                    logger.info(f'Reintentando en {delay:.1f} segundos...')
+                    
+                    time.sleep(delay)
+                    continue
+                else:
+                    # No más reintentos o error no recuperable
+                    if 'response' in locals():
+                        logger.error(f'Request falló permanentemente. Status code: {response.status_code}')
+                        logger.error(f'Response: {response.text}')
+                    break
+        
+        # Si llegamos aquí, fallaron todos los intentos
+        raise CoinGeckoAPIError(f'Request falló después de {self.config.max_retries + 1} intentos: {last_exception}')
+    
+    def _should_retry(self, exception: requests.exceptions.RequestException, response: Optional[requests.Response]) -> bool:
+        """
+        Determinar si un error es recuperable y debe reintentarse.
+        
+        Args:
+            exception: La excepción que ocurrió
+            response: La respuesta HTTP (si existe)
+            
+        Returns:
+            bool: True si debe reintentarse, False si no
+        """
+        # Errores de red/conexión - siempre reintentar
+        if isinstance(exception, (requests.exceptions.ConnectionError, 
+                                 requests.exceptions.Timeout,
+                                 requests.exceptions.ReadTimeout)):
+            return True
+        
+        # Si no hay response, probablemente es error de red
+        if response is None:
+            return True
+            
+        # Errores HTTP específicos que son recuperables
+        retriable_status_codes = {
+            429,  # Rate limit exceeded
+            500,  # Internal server error
+            502,  # Bad gateway
+            503,  # Service unavailable
+            504   # Gateway timeout
+        }
+        
+        if response.status_code in retriable_status_codes:
+            return True
+            
+        # Errores 4xx (excepto 429) generalmente no son recuperables
+        if 400 <= response.status_code < 500:
+            return False
+            
+        # Otros errores 5xx son recuperables
+        if response.status_code >= 500:
+            return True
+            
+        return False
+
+    def _apply_rate_limit(self) -> None:
+        """
+        Aplicar rate limiting entre requests para respetar los límites de la API.
+        """
+        current_time = time.time()
+        time_since_last_request = current_time - self.last_request_time
+        
+        if time_since_last_request < self.config.rate_limit_delay:
+            sleep_time = self.config.rate_limit_delay - time_since_last_request
+            logger.debug(f'Rate limiting: esperando {sleep_time:.2f} segundos')
+            time.sleep(sleep_time)
+        
+        self.last_request_time = time.time()
 
     def _validate_date_config(self) -> None:
         """
