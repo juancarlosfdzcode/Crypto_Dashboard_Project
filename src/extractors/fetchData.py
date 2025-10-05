@@ -33,9 +33,9 @@ class APIConfig:
     base_url: str = 'https://api.coingecko.com/api/v3'
     vs_currency: str = 'usd'
     timeout: int = 30
-    rate_limit_delay: float = 2.0  # Segundos entre requests
-    max_retries: int = 3  # Número máximo de reintentos
-    retry_backoff_factor: float = 1.5  # Factor para backoff exponencial
+    rate_limit_delay: float = 2.0 
+    max_retries: int = 3
+    retry_backoff_factor: float = 2.0
 
 class CoinGeckoAPIError(Exception):
     """Error personalizado para los errores de la API."""
@@ -52,7 +52,6 @@ class CoinGeckoClient:
         if not self.api_token:
             raise ValueError('Es necesario una API Token.')
         
-        # Validar configuración de fechas
         self._validate_date_config()
         
         self.headers = {
@@ -63,7 +62,6 @@ class CoinGeckoClient:
         self.session = requests.Session()
         self.session.headers.update(self.headers)
 
-        # Rate limiting - CORREGIDO: Añadir atributo faltante
         self.last_request_time = 0.0
 
         self.default_tokens = [
@@ -76,7 +74,6 @@ class CoinGeckoClient:
         """Verificar la conectividad con la API"""
         try:
             url = f'{self.config.base_url}/ping'
-            # CORREGIDO: Usar método con retry
             self._make_request_with_retry(url)
             logger.info('Conexión establecida con la API de CoinGecko')
             return True
@@ -84,6 +81,41 @@ class CoinGeckoClient:
         except CoinGeckoAPIError as e:
             logger.error(f'Error conectando con la API: {e}')
             raise CoinGeckoAPIError(f'No se puede establecer conexión con el servidor: {e}')
+
+    def coin_list(self) -> List:
+        """Devuelve un listado con todas las coins disponibles"""
+
+        try:
+            url = f'{self.config.base_url}/coins/list'
+            
+            params = {
+                'include_platform': 'true'
+            }
+
+            data = self._make_request_with_retry(url, params)
+            logger.info('Listado de coins disponibles obtenido correctamente')
+
+            return data           
+
+        except CoinGeckoAPIError as e:
+            logger.error(f'Error obteniendo el listado de coins disponibles: {e}')
+            raise CoinGeckoAPIError(f'No se ha podido obtener el listado de coins disponibles: {e}')
+
+    def trending_search_list(self) -> Dict:
+        """Devuelve información sobre las tendencias de búsqueda de coins, NFTs y categorías en CoinGecko. 
+        Últimas 24 horas"""
+
+        try:
+            url = f'{self.config.base_url}/search/trending'
+
+            data = self._make_request_with_retry(url)
+            logger.info('Listado de tendencias de búsqueda obtenido correctamente')
+
+            return data
+
+        except CoinGeckoAPIError as e:
+            logger.error(f'Error obteniendo el listado de tendencias de búsqueda: {e}')
+            raise CoinGeckoAPIError(f'No se ha podido obtener el listado de tendencias de búsqueda: {e}')            
 
     def _make_request_with_retry(self, url: str, params: Optional[Dict] = None) -> Dict:
         """
@@ -414,6 +446,6 @@ if __name__ == "__main__":
             print(df_result.head())
         else:
             print("No se obtuvieron datos")
-            
+
     except Exception as e:
         logger.error(f"Error en la ejecución: {e}")
