@@ -17,7 +17,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src', 'extractors')))
 
 # Importar las clases a testear
-from fetchData import CoinGeckoClient, APIConfig, Token, CoinGeckoAPIError
+from dataExtraction import CoinGeckoClient, APIConfig, Token, CoinGeckoAPIError
 
 class TestToken:
     """Tests para la clase Token"""
