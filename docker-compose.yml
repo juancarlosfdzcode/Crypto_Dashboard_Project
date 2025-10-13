@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  extractor:
+    build:
+      context: ./services/extractor
+      dockerfile: Dockerfile
+    container_name: crypto-extractor
+    
+    environment:
+      - coinGeckoToken=${coinGeckoToken}
+    
+    volumes:
+      - ./data:/app/data
+    
+    restart: "no"
+
+volumes:
+  data:

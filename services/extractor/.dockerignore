@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Tests y experiments (no necesarios en producción)
+tests/
+experiments/
+
+# Logs y temporales
+*.log
+logs/
+tmp/
+
+# Base de datos (se monta como volumen)
+*.duckdb
+*.db
+data/
+
+# Environment files
+.env
+
+# Git
+.git
+.gitignore

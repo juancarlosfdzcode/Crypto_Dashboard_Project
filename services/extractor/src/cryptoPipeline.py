@@ -8,8 +8,8 @@ from typing import List
 import pandas as pd
 
 # Imports de tus módulos existentes
-from src.extractors.dataExtraction import CoinGeckoClient, APIConfig, Token
-from src.storage.duckDBManager import DuckDBManager
+from extractors.dataExtraction import CoinGeckoClient, APIConfig, Token
+from storage.duckDBManager import DuckDBManager
 
 logger = logging.getLogger(__name__)
 
