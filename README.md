@@ -306,9 +306,9 @@ Este proyecto está bajo la Licencia MIT. Ver archivo LICENSE para más detalles
 👤 Autor
 Juan Carlos
 
-GitHub: @tu-usuario
-LinkedIn: tu-perfil
-Medium: tu-medium
+GitHub: https://github.com/juancarlosfdzcode
+LinkedIn: https://www.linkedin.com/in/juan-carlos-fdz/
+Medium: https://medium.com/@juancarlosfdzgarcode
 
 🙏 Agradecimientos
 
