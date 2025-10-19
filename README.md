@@ -66,17 +66,19 @@ Crypto_Dashboard_Project/
 
 ### Para uso con Docker (Recomendado).
 
-Docker 20.10+
-Docker Compose V2
-Token de API de CoinGecko (obtener [aquí](https://www.coingecko.com/en/api))
+* Docker 20.10+.
+* Docker Compose V2.
+* Token de API de CoinGecko (obtener [aquí](https://www.coingecko.com/en/api)).
 
-Para uso local
+### Para uso local.
 
-Python 3.11+
-Token de API de CoinGecko
+* Python 3.11+.
+* Token de API de CoinGecko.
 
-🚀 Quick Start
-Opción 1: Docker (Recomendado)
+## 🚀 Quick Start.
+
+### Opción 1: Docker (Recomendado).
+
 bash# 1. Clonar repositorio
 git clone https://github.com/tu-usuario/crypto-dashboard-project.git
 cd Crypto_Dashboard_Project
