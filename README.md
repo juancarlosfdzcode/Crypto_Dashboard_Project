@@ -30,6 +30,7 @@ El objetivo de este proyecto es construir un pipeline robusto y listo para produ
 
 ## 📁 Estructura del Proyecto.
 
+```
 Crypto_Dashboard_Project/
 ├── services/
 │   └── extractor/              # Servicio de extracción dockerizado
@@ -54,6 +55,7 @@ Crypto_Dashboard_Project/
 ├── README-DOCKER.md           # Guía de uso Docker
 ├── .env                        # Variables de entorno
 └── README.md                   # Este archivo
+```
 
 ## 📋 Requisitos.
 
