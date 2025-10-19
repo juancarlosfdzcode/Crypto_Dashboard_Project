@@ -1,5 +1,8 @@
 # 📊 Crypto Dashboard Project
 
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Tests](https://img.shields.io/badge/tests-55%2B-green)
 
 El objetivo de este proyecto es construir un pipeline robusto y listo para producción que permita la extracción, almacenamiento y análisis de datos históricos de criptomonedas desde la API de CoinGecko. Con una arquitectura dockerizada y DuckDB como base de datos analítica.
 
@@ -81,7 +84,7 @@ Crypto_Dashboard_Project/
 
 #### 1. Clonar repositorio
 ```
-git clone https://github.com/tu-usuario/crypto-dashboard-project.git
+git clone https://github.com/juancarlosfdzcode/Crypto_Dashboard_Project.git
 cd Crypto_Dashboard_Project
 ```
 #### 2. Configurar token
@@ -99,7 +102,7 @@ Ver README-DOCKER.md para documentación completa de Docker.
 
 #### 1. Clonar repositorio.
 ```
-git clone https://github.com/tu-usuario/crypto-dashboard-project.git
+git clone https://github.com/juancarlosfdzcode/Crypto_Dashboard_Project.git
 cd Crypto_Dashboard_Project
 ```
 
