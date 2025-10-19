@@ -264,4 +264,4 @@ Ver [README-DOCKER.md](README-DOCKER.md) para documentación completa de Docker.
 * LinkedIn: https://www.linkedin.com/in/juan-carlos-fdz/
 * Medium: https://medium.com/@juancarlosfdzgarcode
 
-⭐ Si este proyecto te resultó útil, considera darle una estrella en GitHub
+⭐ Si este proyecto te resultó útil, considera darle una estrella en GitHub.
