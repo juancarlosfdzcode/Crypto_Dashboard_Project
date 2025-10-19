@@ -59,6 +59,7 @@ Crypto_Dashboard_Project/
 ├── docker-compose.yml          # Orquestación Docker
 ├── README-DOCKER.md           # Guía de uso Docker
 ├── .env                        # Variables de entorno
+├── requirements.txt            # Dependencias globales
 └── README.md                   # Este archivo
 
 
