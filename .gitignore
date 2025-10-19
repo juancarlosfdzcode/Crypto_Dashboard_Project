@@ -39,3 +39,26 @@ wheels/
 # OS
 .DS_Store
 Thumbs.db
+
+# Database files (DuckDB)
+*.duckdb
+*.duckdb.wal
+*.db
+data/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Logs
+*.log
+logs/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.bak
