@@ -61,11 +61,11 @@ Crypto_Dashboard_Project/
 
 ## 📋 Requisitos.
 
-Para uso con Docker (Recomendado)
+### Para uso con Docker (Recomendado).
 
 Docker 20.10+
 Docker Compose V2
-Token de API de CoinGecko (obtener aquí)
+Token de API de CoinGecko (obtener [aquí](https://www.coingecko.com/en/api))
 
 Para uso local
 
