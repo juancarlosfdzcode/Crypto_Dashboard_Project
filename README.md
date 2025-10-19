@@ -247,7 +247,7 @@ docker compose down
 docker system prune -f
 ```
 
-Ver README-DOCKER.md para documentación completa.
+Ver [README-DOCKER.md](README-DOCKER.md) para documentación completa de Docker.
 
 ## 🤝 Contribuir.
 
