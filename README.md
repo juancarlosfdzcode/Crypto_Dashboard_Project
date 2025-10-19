@@ -21,18 +21,15 @@ El objetivo de este proyecto es construir un pipeline robusto y listo para produ
 * Parallel Extractions: Análisis comparativo de extracción secuencial vs paralela.
 * Circuit Breaker Pattern: Implementación de protección contra fallos en cascada.
 
-Testing
+### Testing.
 
-✅ Suite Comprehensiva: 55+ tests unitarios e integración
+#### Suite Comprehensiva: 55+ tests unitarios e integración.
 
-29 tests del extractor
-26 tests de DuckDB
+* 29 tests del extractor.
+* 26 tests de DuckDB.
 
+## 📁 Estructura del Proyecto.
 
-✅ Cobertura >95%: Alta cobertura de código
-✅ Tests de Integración: Validación con mocks de la API
-
-📁 Estructura del Proyecto
 Crypto_Dashboard_Project/
 ├── services/
 │   └── extractor/              # Servicio de extracción dockerizado
@@ -57,7 +54,9 @@ Crypto_Dashboard_Project/
 ├── README-DOCKER.md           # Guía de uso Docker
 ├── .env                        # Variables de entorno
 └── README.md                   # Este archivo
-📋 Requisitos
+
+## 📋 Requisitos.
+
 Para uso con Docker (Recomendado)
 
 Docker 20.10+
