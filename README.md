@@ -162,7 +162,7 @@ python cryptoPipeline.py
 ## ⚙️ Configuración Avanzada.
 
 ### Rate Limiting Personalizado.
-```
+```python
 pythonconfig = APIConfig(
     fromDate='2024-01-01',
     toDate='2024-12-31',
@@ -171,7 +171,7 @@ pythonconfig = APIConfig(
 ```
 
 ### Retry Logic Personalizado.
-```
+```python
 pythonconfig = APIConfig(
     fromDate='2024-01-01',
     toDate='2024-12-31',
@@ -183,7 +183,7 @@ pythonconfig = APIConfig(
 ### Modificar Tokens Extraídos.
 
 Edita services/extractor/src/cryptoPipeline.py:
-```
+```python
 pythontokens = [
     Token(coin='btc', id='bitcoin'),
     Token(coin='eth', id='ethereum'),
