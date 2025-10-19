@@ -16,17 +16,10 @@ El objetivo de este proyecto es construir un pipeline robusto y listo para produ
 * Connection Pooling: Reutilización de conexiones HTTP para mejor rendimiento.
 * Logging Detallado: Trazabilidad completa del proceso de extracción.
 
-### Arquitectura.
+### Experimentos de Optimización
 
-🐋 Dockerizado: Contenedor optimizado con Python 3.11-slim
-🐋 Docker Compose: Orquestación lista para multi-servicio
-📦 Volúmenes Persistentes: Datos que sobreviven reinicios de contenedores
-🔄 Pipeline Completo: Extracción → Transformación → Almacenamiento
-
-Experimentos de Optimización
-
-🔬 Parallel Extractions: Análisis comparativo de extracción secuencial vs paralela
-🔬 Circuit Breaker Pattern: Implementación de protección contra fallos en cascada
+* Parallel Extractions: Análisis comparativo de extracción secuencial vs paralela.
+* Circuit Breaker Pattern: Implementación de protección contra fallos en cascada.
 
 Testing
 
