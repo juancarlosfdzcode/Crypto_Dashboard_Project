@@ -250,16 +250,15 @@ Ver README-DOCKER.md para documentación completa.
 
 ### Fork el proyecto
 
-Crea una rama (git checkout -b feature/AmazingFeature).
-Commit cambios (git commit -m 'Add AmazingFeature').
-Push a la rama (git push origin feature/AmazingFeature).
-
-Abre un Pull Request.
+* Crea una rama (git checkout -b feature/AmazingFeature).
+* Commit cambios (git commit -m 'Add AmazingFeature').
+* Push a la rama (git push origin feature/AmazingFeature).
+* Abre un Pull Request.
 
 ## 👤 Autor
 
-GitHub: https://github.com/juancarlosfdzcode
-LinkedIn: https://www.linkedin.com/in/juan-carlos-fdz/
-Medium: https://medium.com/@juancarlosfdzgarcode
+* GitHub: https://github.com/juancarlosfdzcode
+* LinkedIn: https://www.linkedin.com/in/juan-carlos-fdz/
+* Medium: https://medium.com/@juancarlosfdzgarcode
 
 ⭐ Si este proyecto te resultó útil, considera darle una estrella en GitHub
