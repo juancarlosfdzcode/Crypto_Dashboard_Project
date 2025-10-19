@@ -7,16 +7,16 @@ El objetivo de este proyecto es construir un pipeline robusto y listo para produ
 
 ### Pipeline Principal.
 
-✅ Extracción de datos históricos desde CoinGecko API
-✅ Rate Limiting Proactivo: Respeta automáticamente los límites de la API
-✅ Retry Logic con Backoff Exponencial: Reintentos inteligentes ante fallos transitorios
-✅ Almacenamiento en DuckDB: Base de datos analítica embebida de alto rendimiento
-✅ Validación de Configuración: Validación exhaustiva de fechas y parámetros
-✅ Manejo Robusto de Errores: Clasificación inteligente entre errores recuperables y permanentes
-✅ Connection Pooling: Reutilización de conexiones HTTP para mejor rendimiento
-✅ Logging Detallado: Trazabilidad completa del proceso de extracción
+* Extracción de datos históricos desde CoinGecko API.
+* Rate Limiting Proactivo: Respeta automáticamente los límites de la API.
+* Retry Logic con Backoff Exponencial: Reintentos inteligentes ante fallos transitorios.
+* Almacenamiento en DuckDB: Base de datos analítica embebida de alto rendimiento.
+* Validación de Configuración: Validación exhaustiva de fechas y parámetros.
+* Manejo Robusto de Errores: Clasificación inteligente entre errores recuperables y permanentes.
+* Connection Pooling: Reutilización de conexiones HTTP para mejor rendimiento.
+* Logging Detallado: Trazabilidad completa del proceso de extracción.
 
-Arquitectura
+### Arquitectura.
 
 🐋 Dockerizado: Contenedor optimizado con Python 3.11-slim
 🐋 Docker Compose: Orquestación lista para multi-servicio
