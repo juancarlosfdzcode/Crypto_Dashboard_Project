@@ -258,8 +258,6 @@ Abre un Pull Request.
 
 ## 👤 Autor
 
-Juan Carlos.
-
 GitHub: https://github.com/juancarlosfdzcode
 LinkedIn: https://www.linkedin.com/in/juan-carlos-fdz/
 Medium: https://medium.com/@juancarlosfdzgarcode
