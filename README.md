@@ -1,4 +1,5 @@
-📊 Crypto Dashboard Project
+## 📊 Crypto Dashboard Project
+
 Pipeline robusto y listo para producción para la extracción, almacenamiento y análisis de datos históricos de criptomonedas desde la API de CoinGecko. Arquitectura dockerizada con DuckDB como base de datos analítica.
 🎯 Características
 Pipeline Principal
