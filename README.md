@@ -30,6 +30,7 @@ El objetivo de este proyecto es construir un pipeline robusto y listo para produ
 
 ## 📁 Estructura del Proyecto.
 
+
 ```
 Crypto_Dashboard_Project/
 ├── services/
@@ -56,6 +57,7 @@ Crypto_Dashboard_Project/
 ├── .env                        # Variables de entorno
 └── README.md                   # Este archivo
 ```
+
 
 ## 📋 Requisitos.
 
