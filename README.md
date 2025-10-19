@@ -79,253 +79,189 @@ Crypto_Dashboard_Project/
 
 ### Opción 1: Docker (Recomendado).
 
-bash# 1. Clonar repositorio
+#### 1. Clonar repositorio
+```
 git clone https://github.com/tu-usuario/crypto-dashboard-project.git
 cd Crypto_Dashboard_Project
-
-# 2. Configurar token
+```
+#### 2. Configurar token
+```
 echo "coinGeckoToken=TU_TOKEN_AQUI" > .env
+```
 
-# 3. Ejecutar con Docker Compose
+#### 3. Ejecutar con Docker Compose
+```
 docker compose run --rm extractor
 Ver README-DOCKER.md para documentación completa de Docker.
-Opción 2: Instalación Local
-bash# 1. Clonar repositorio
+```
+
+### Opción 2: Instalación Local.
+
+#### 1. Clonar repositorio.
+```
 git clone https://github.com/tu-usuario/crypto-dashboard-project.git
 cd Crypto_Dashboard_Project
+```
 
-# 2. Crear entorno virtual
+#### 2. Crear entorno virtual.
+```
 python -m venv venv
 source venv/bin/activate  # En Windows: venv\Scripts\activate
+```
 
-# 3. Instalar dependencias
+#### 3. Instalar dependencias.
+```
 pip install -r requirements.txt
+```
 
-# 4. Configurar token
+#### 4. Configurar token.
+```
 echo "coinGeckoToken=TU_TOKEN_AQUI" > .env
+```
 
-# 5. Ejecutar pipeline
+#### 5. Ejecutar pipeline.
+```
 python cryptoPipeline.py
-💻 Uso
-Pipeline Completo
-pythonfrom cryptoPipeline import CryptoPipeline
-from src.extractors.dataExtraction import Token
+```
 
-# Definir tokens
-tokens = [
-    Token(coin='btc', id='bitcoin'),
-    Token(coin='eth', id='ethereum'),
-    Token(coin='sol', id='solana')
-]
+## 🏗️ Arquitectura.
 
-# Ejecutar pipeline
-with CryptoPipeline() as pipeline:
-    pipeline.extract_and_store(tokens, "2025-01-01", "2025-03-31")
-    pipeline.get_stats()
-Consultar Datos Almacenados
-pythonfrom src.storage.duckDBManager import DuckDBManager
+### Fase 1: Extractor + Storage (✅ Completado).
 
-# Conectar a la base de datos
-with DuckDBManager() as db:
-    # Obtener datos de Bitcoin
-    btc_data = db.get_market_data('bitcoin', 
-                                   start_date='2025-01-01',
-                                   end_date='2025-03-31')
-    
-    # Ver estadísticas
-    stats = db.get_extraction_stats()
-    print(stats)
-Visualizar Datos
-bash# Script de visualización
-python view_database.py
+* Extracción de datos de CoinGecko.
+* Almacenamiento en DuckDB.
+* Dockerización completa.
+* Tests comprehensivos.
+* Docker Compose configurado.
 
-# Con DuckDB CLI
-duckdb data/crypto_data.duckdb
-🧪 Tests
-Ejecutar Todos los Tests
-bash# Suite completa
-pytest tests/ -v
+### Fase 2: API + Scheduler (🔜 Próximo).
 
-# Con cobertura
-pytest tests/ -v --cov=src --cov-report=html
-Tests Específicos
-bash# Solo tests del extractor
-pytest tests/testExtractors.py -v
+* API REST con FastAPI.
+* Scheduler para extracciones automáticas.
+* Multi-servicio con Docker Compose.
 
-# Solo tests de DuckDB
-pytest tests/testDuckDB.py -v
+### Fase 3: Dashboard (🔜 Próximo).
 
-# Test específico
-pytest tests/testExtractors.py::TestDateValidation::test_valid_date_range -v
-Resultados actuales:
+* Visualización con Streamlit.
+* Gráficos interactivos.
+* KPIs y métricas en tiempo real.
 
-✅ 29/29 tests del extractor
-✅ 26/26 tests de DuckDB
-✅ Cobertura >95%
+## 🛠️ Tecnologías.
 
-🔬 Experimentos
-Parallel Extractions
-Análisis comparativo entre extracción secuencial y paralela:
-bashpython experiments/parallel_extraction_poc.py
-Conclusión: Con rate limiting, la paralelización no mejora el rendimiento.
-Circuit Breaker
-Implementación del patrón para protección contra fallos:
-bashpython experiments/circuit_breaker_poc.py
-Estados: CLOSED → OPEN → HALF_OPEN
-📊 Estructura de Datos
-Tabla: market_data
-sqlCREATE TABLE market_data (
-    coin_id VARCHAR,
-    coin_symbol VARCHAR,
-    timestamp BIGINT,
-    date DATE,
-    price DOUBLE,
-    market_cap DOUBLE,
-    total_volume DOUBLE,
-    extraction_timestamp TIMESTAMP,
-    PRIMARY KEY (coin_id, timestamp)
-)
-Tabla: extraction_log
-sqlCREATE TABLE extraction_log (
-    id INTEGER PRIMARY KEY,
-    coin_id VARCHAR,
-    from_date DATE,
-    to_date DATE,
-    records_inserted INTEGER,
-    execution_time_seconds DOUBLE,
-    status VARCHAR,
-    error_message VARCHAR,
-    timestamp TIMESTAMP
-)
-🏗️ Arquitectura
-Fase 1: Extractor + Storage (✅ Completado)
+* Python 3.11: Lenguaje principal.
+* DuckDB 0.9.2: Base de datos analítica embebida.
+* Docker: Containerización.
+* Docker Compose: Orquestación de servicios.
+* Requests: Cliente HTTP con rate limiting.
+* Pandas: Procesamiento de datos.
+* Pytest: Testing framework.
 
-✅ Extracción de datos de CoinGecko
-✅ Almacenamiento en DuckDB
-✅ Dockerización completa
-✅ Tests comprehensivos
-✅ Docker Compose configurado
+## ⚙️ Configuración Avanzada.
 
-Fase 2: API + Scheduler (🔜 Próximo)
-
-🔜 API REST con FastAPI
-🔜 Scheduler para extracciones automáticas
-🔜 Multi-servicio con Docker Compose
-
-Fase 3: Dashboard (📋 Planificado)
-
-📋 Visualización con Streamlit
-📋 Gráficos interactivos
-📋 KPIs y métricas en tiempo real
-
-🛠️ Tecnologías
-
-Python 3.11: Lenguaje principal
-DuckDB 0.9.2: Base de datos analítica embebida
-Docker: Containerización
-Docker Compose: Orquestación de servicios
-Requests: Cliente HTTP con rate limiting
-Pandas: Procesamiento de datos
-Pytest: Testing framework
-
-⚙️ Configuración Avanzada
-Rate Limiting Personalizado
+### Rate Limiting Personalizado.
+```
 pythonconfig = APIConfig(
     fromDate='2024-01-01',
     toDate='2024-12-31',
     rate_limit_delay=3.0  # 3 segundos entre requests
 )
-Retry Logic Personalizado
+```
+
+### Retry Logic Personalizado.
+```
 pythonconfig = APIConfig(
     fromDate='2024-01-01',
     toDate='2024-12-31',
     max_retries=5,              # 5 reintentos
     retry_backoff_factor=1.5    # Factor backoff
 )
-Modificar Tokens Extraídos
+```
+
+### Modificar Tokens Extraídos.
+
 Edita services/extractor/src/cryptoPipeline.py:
+```
 pythontokens = [
     Token(coin='btc', id='bitcoin'),
     Token(coin='eth', id='ethereum'),
     Token(coin='ada', id='cardano'),
     # Añade más aquí
 ]
-🚨 Manejo de Errores
-Errores Recuperables (se reintenta)
+```
 
-ConnectionError: Problemas de red
-Timeout: Request timeout
-429: Rate limit exceeded
-500-504: Errores de servidor
+## 🚨 Manejo de Errores.
 
-Errores Permanentes (no se reintenta)
+### Errores Recuperables (se reintenta)
 
-400: Bad request
-401: Unauthorized
-404: Not found
+* ConnectionError: Problemas de red
+* Timeout: Request timeout
+* 429: Rate limit exceeded
+* 500-504: Errores de servidor
 
-📈 Datos Extraídos
-Criptomonedas Actuales
+### Errores Permanentes (no se reintenta)
 
-AAVE (aave)
-Cronos (crypto-com-chain)
-Chainlink (chainlink)
+* 400: Bad request
+* 401: Unauthorized
+* 404: Not found
+
+## 📈 Datos Extraídos.
+
+### Criptomonedas Actuales.
+
+* AAVE (aave).
+* Cronos (crypto-com-chain).
+* Chainlink (chainlink).
 
 Métricas por Token
 
-Precio (USD)
-Market Cap
-Volumen de trading 24h
-Timestamps y fechas
+* Precio (USD).
+* Market Cap.
+* Volumen de trading 24h.
+* Timestamps y fechas.
 
-Ejemplo de Datos
-🪙 Monedas en base de datos: 3
-  • aave: 2,133 registros (2025-01-01 → 2025-03-30)
-  • chainlink: 2,132 registros (2025-01-01 → 2025-03-30)
-  • crypto-com-chain: 2,133 registros (2025-01-01 → 2025-03-30)
-🐋 Docker
-Comandos Útiles
-bash# Ejecutar extractor
+
+## 🐋 Docker.
+
+### Comandos Útiles.
+
+#### Ejecutar extractor.
+```
 docker compose run --rm extractor
-
-# Ver logs
+```
+#### Ver logs.
+```
 docker compose logs -f extractor
+```
 
-# Rebuild imagen
+#### Rebuild imagen.
+```
 docker compose build extractor
+```
 
-# Limpiar
+#### Limpiar.
+```
 docker compose down
 docker system prune -f
+```
+
 Ver README-DOCKER.md para documentación completa.
-🤝 Contribuir
 
-Fork el proyecto
-Crea una rama (git checkout -b feature/AmazingFeature)
-Commit cambios (git commit -m 'Add AmazingFeature')
-Push a la rama (git push origin feature/AmazingFeature)
-Abre un Pull Request
+## 🤝 Contribuir.
 
-📝 Licencia
-Este proyecto está bajo la Licencia MIT. Ver archivo LICENSE para más detalles.
-👤 Autor
-Juan Carlos
+### Fork el proyecto
+
+Crea una rama (git checkout -b feature/AmazingFeature).
+Commit cambios (git commit -m 'Add AmazingFeature').
+Push a la rama (git push origin feature/AmazingFeature).
+
+Abre un Pull Request.
+
+## 👤 Autor
+
+Juan Carlos.
 
 GitHub: https://github.com/juancarlosfdzcode
 LinkedIn: https://www.linkedin.com/in/juan-carlos-fdz/
 Medium: https://medium.com/@juancarlosfdzgarcode
-
-🙏 Agradecimientos
-
-CoinGecko por proporcionar la API gratuita
-DuckDB por la excelente base de datos analítica
-Comunidad de Python por las excelentes librerías
-
-📚 Recursos Adicionales
-
-Documentación de CoinGecko API
-Documentación de DuckDB
-Docker Best Practices
-
 
 ⭐ Si este proyecto te resultó útil, considera darle una estrella en GitHub
