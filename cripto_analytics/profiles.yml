@@ -1,0 +1,8 @@
+cripto_analytics:
+  outputs:
+    dev:
+      type: duckdb
+      path: '/home/juancarlos/Escritorio/Projects/Crypto_Dashboard_Project/data/crypto_data.duckdb'
+      schema: analytics
+      threads: 4
+  target: dev

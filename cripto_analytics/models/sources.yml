@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+
+  - name: main
+    description: "Base de datos principal con información cripto."
+    schema: main
+    tables:
+      - name: market_data
+        description: "Información de mercado de criptoactivos."
+        columns:
+          - name: coin_id
+          - name: coin_symbol
+          - name: timestamp
+          - name: date
+          - name: price
+          - name: market_cap
+          - name: total_volume
+          - name: extraction_timestamp

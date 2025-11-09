@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: stg_market_data
+    description: "Cleaned crypto market data with calculated fields"
+    columns:
+      - name: coin_id
+        description: "Unique identifier for cryptocurrency"
+        tests:
+          - not_null
+          
+      - name: date
+        description: "Date of the market data"
+        tests:
+          - not_null
+          
+      - name: price
+        description: "Price in USD"
+        tests:
+          - not_null
+          - test_positive_value
+          
+      - name: priceClean
+        description: "Price rounded to 2 decimals"
+        tests:
+          - not_null
+          - test_positive_value
