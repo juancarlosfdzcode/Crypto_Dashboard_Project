@@ -8,6 +8,6 @@ SELECT
     total_volume,
     extraction_timestamp,
     ROUND(price, 2) AS priceClean,
-    ROUND(market_cap / 1000000.0, 2) AS marketCapMillions,
-    ROUND(total_volume / 1000000.0, 2) AS volumeMillions
+    {{ toMillions('market_cap') }} AS marketCapMillions,
+    {{ toMillions('total_volume') }} AS volumeMillions
 FROM {{source('main','market_data')}}  
