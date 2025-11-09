@@ -25,3 +25,18 @@ models:
         tests:
           - not_null
           - test_positive_value
+  
+  - name: stg_price_changes
+    columns:
+      - name: coin_id
+        tests:
+          - not_null
+      - name: date  
+        tests:
+          - not_null
+      - name: pct_change_1d
+        description: "Daily percentage change"
+      - name: daily_volatility
+        description: "Daily volatility indicator"
+        tests:
+          - test_positive_value
